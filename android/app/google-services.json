@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "711211469592",
+    "firebase_url": "https://p-warning-default-rtdb.firebaseio.com",
+    "project_id": "p-warning",
+    "storage_bucket": "p-warning.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:711211469592:android:a0be9625236c9e85f06c6d",
+        "android_client_info": {
+          "package_name": "com.example.p_warning_flutter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCsr502F7KQUkEvbEZSXKS1La_IoCvKf5Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
