@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:percent_indicator/circular_percent_indicator.dart';
 
 class TemperaturePage extends StatefulWidget {
   const TemperaturePage({Key? key}) : super(key: key);
@@ -61,11 +60,11 @@ class _TemperaturePageState extends State<TemperaturePage> {
                             color: Colors.indigo.withOpacity(0.9),
                             spreadRadius: 10,
                             blurRadius: 7,
-                            offset: Offset(0, 0),
+                            offset: const Offset(0, 0),
                           ),
                         ],
                       ),
-                      child: Center(
+                      child: const Center(
                         child: Text(
                           '26\u00B0',
                           style: TextStyle(

@@ -1,5 +1,6 @@
 // ignore_for_file: library_private_types_in_public_api
 
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -13,11 +14,19 @@ class StreamView extends StatefulWidget {
 
 class _StreamViewState extends State<StreamView> {
   late WebSocketChannel channel;
-
+  final refdata = FirebaseDatabase.instance.ref();
+  late String IP;
   @override
   void initState() {
     super.initState();
-    channel = IOWebSocketChannel.connect('ws://192.168.1.11:81');
+    refdata.child('IP/').onValue.listen((event) {
+      setState(() {
+        IP = event.snapshot.value.toString();
+        channel = IOWebSocketChannel.connect('ws://${IP}:81');
+
+        print(IP);
+      });
+    });
   }
 
   @override
