@@ -5,28 +5,36 @@ class Device extends StatefulWidget {
   const Device({super.key});
 
   @override
-  State<Device> createState() => _StreamCamState();
+  State<Device> createState() => _DeviceState();
 }
 
-class _StreamCamState extends State<Device> {
+class _DeviceState extends State<Device> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // appBar: AppBar(
+      //   backgroundColor: Color.fromARGB(31, 88, 11, 15),
+      //   title: const Text(
+      //     "Device at Home",
+      //     style: TextStyle(fontSize: 20),
+      //   ),
+      // ),
       backgroundColor: Colors.indigo.shade50,
       body: SafeArea(
         child: Container(
           margin: const EdgeInsets.only(top: 18, left: 24, right: 24),
           child: Column(
             children: [
-              const Row(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    "HI THERE",
-                    style: TextStyle(
-                      fontSize: 18,
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Icon(
+                      Icons.arrow_back_ios,
                       color: Colors.indigo,
-                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   RotatedBox(

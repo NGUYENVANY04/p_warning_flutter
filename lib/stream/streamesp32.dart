@@ -13,7 +13,9 @@ class StreamView extends StatefulWidget {
 }
 
 class _StreamViewState extends State<StreamView> {
-  late WebSocketChannel channel;
+  WebSocketChannel channel =
+      IOWebSocketChannel.connect('ws://192.168.2.189:81');
+
   final refdata = FirebaseDatabase.instance.ref();
   late String IP;
   @override
@@ -23,7 +25,6 @@ class _StreamViewState extends State<StreamView> {
       setState(() {
         IP = event.snapshot.value.toString();
         channel = IOWebSocketChannel.connect('ws://${IP}:81');
-
         print(IP);
       });
     });
@@ -31,103 +32,129 @@ class _StreamViewState extends State<StreamView> {
 
   @override
   Widget build(BuildContext context) {
+    // if (channel == null) {
+    //   // return a placeholder or loading indicator until channel is initialized
+    //   return CircularProgressIndicator();
+    // }
+
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 211, 206, 189),
-      // appBar: AppBar(
-      //   backgroundColor: Color.fromARGB(31, 88, 11, 15),
-      //   title: const Text(
-      //     "Stream Camera From ESP32",
-      //     style: TextStyle(fontSize: 20),
-      //   ),
-      // ),
-      body: Column(
-        children: [
-          const SizedBox(
-            height: 50,
-          ),
-          Center(
-            child: Image.asset(
-              "assets/banner.png",
-              scale: 1.2,
-            ),
-          ),
-          Center(
-            child: Container(
-              width: 400,
-              height: 400,
-              margin: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 5,
-                    blurRadius: 7,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.center,
+      body: SafeArea(
+        child: Container(
+          margin: const EdgeInsets.only(top: 18, left: 24, right: 24),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Expanded(
-                    child: StreamBuilder(
-                      stream: channel.stream,
-                      builder: (context, snapshot) {
-                        if (snapshot.hasError) {
-                          return Center(
-                            child: SizedBox(
-                              height: 200,
-                              width: 250,
-                              child: Text(
-                                'Error: ${snapshot.error}',
-                                style: const TextStyle(fontSize: 15),
-                              ),
-                            ),
-                          );
-                        } else if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        } else {
-                          return Image.memory(
-                            snapshot.data,
-                            gaplessPlayback: true,
-                            width: 280,
-                            height: 280,
-                          );
-                        }
-                      },
+                  // const SizedBox(
+                  //   // height: 100,
+                  //   width: 1,
+                  // ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Icon(
+                      Icons.arrow_back_ios,
+                      color: Colors.indigo,
                     ),
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          // Handle capture image
-                        },
-                        child: const Text('Capture Image'),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          // Handle reconnect
-                        },
-                        child: const Text('Reconnect'),
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 20,
+                  const RotatedBox(
+                    quarterTurns: 135,
+                    child: Icon(
+                      Icons.bar_chart_rounded,
+                      color: Colors.indigo,
+                      size: 28,
+                    ),
                   )
                 ],
               ),
-            ),
+              Center(
+                child: Image.asset(
+                  "assets/banner.png",
+                  scale: 1.5,
+                ),
+              ),
+              Center(
+                child: Container(
+                  width: 400,
+                  height: 400,
+                  margin: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.5),
+                        spreadRadius: 5,
+                        blurRadius: 7,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: StreamBuilder(
+                          stream: channel.stream,
+                          builder: (context, snapshot) {
+                            if (snapshot.hasError) {
+                              return Center(
+                                child: SizedBox(
+                                  height: 200,
+                                  width: 250,
+                                  child: Text(
+                                    'Error: ${snapshot.error}',
+                                    style: const TextStyle(fontSize: 15),
+                                  ),
+                                ),
+                              );
+                            } else if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            } else {
+                              return Image.memory(
+                                snapshot.data,
+                                gaplessPlayback: true,
+                                width: 260,
+                                height: 280,
+                              );
+                            }
+                          },
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              // Handle capture image
+                            },
+                            child: const Text('Capture Image'),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              // Handle reconnect
+                            },
+                            child: const Text('Reconnect'),
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 20,
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
