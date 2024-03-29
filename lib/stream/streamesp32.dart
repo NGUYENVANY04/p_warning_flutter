@@ -20,11 +20,9 @@ class _StreamViewState extends State<StreamView> {
   void initState() {
     super.initState();
     refdata.child('IP/').onValue.listen((event) {
-      setState(() {
-        IP = event.snapshot.value.toString();
-        channel = IOWebSocketChannel.connect('ws://${IP}:81');
-        print(IP);
-      });
+      IP = event.snapshot.value.toString();
+      channel = IOWebSocketChannel.connect('ws://${IP}:81');
+      print(IP);
     });
   }
 
