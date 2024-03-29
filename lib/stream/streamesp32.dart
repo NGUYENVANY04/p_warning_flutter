@@ -13,9 +13,7 @@ class StreamView extends StatefulWidget {
 }
 
 class _StreamViewState extends State<StreamView> {
-  WebSocketChannel channel =
-      IOWebSocketChannel.connect('ws://192.168.2.189:81');
-
+  WebSocketChannel? channel;
   final refdata = FirebaseDatabase.instance.ref();
   late String IP;
   @override
@@ -98,36 +96,38 @@ class _StreamViewState extends State<StreamView> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Expanded(
-                        child: StreamBuilder(
-                          stream: channel.stream,
-                          builder: (context, snapshot) {
-                            if (snapshot.hasError) {
-                              return Center(
-                                child: SizedBox(
-                                  height: 200,
-                                  width: 250,
-                                  child: Text(
-                                    'Error: ${snapshot.error}',
-                                    style: const TextStyle(fontSize: 15),
-                                  ),
-                                ),
-                              );
-                            } else if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return const Center(
-                                child: CircularProgressIndicator(),
-                              );
-                            } else {
-                              return Image.memory(
-                                snapshot.data,
-                                gaplessPlayback: true,
-                                width: 260,
-                                height: 280,
-                              );
-                            }
-                          },
-                        ),
-                      ),
+                          child: channel != null
+                              ? StreamBuilder(
+                                  stream: channel?.stream,
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasError) {
+                                      return Center(
+                                        child: SizedBox(
+                                          height: 200,
+                                          width: 250,
+                                          child: Text(
+                                            'Error: ${snapshot.error}',
+                                            style:
+                                                const TextStyle(fontSize: 15),
+                                          ),
+                                        ),
+                                      );
+                                    } else if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return const Center(
+                                        child: CircularProgressIndicator(),
+                                      );
+                                    } else {
+                                      return Image.memory(
+                                        snapshot.data,
+                                        gaplessPlayback: true,
+                                        width: 260,
+                                        height: 280,
+                                      );
+                                    }
+                                  },
+                                )
+                              : Text("Loading...")),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
