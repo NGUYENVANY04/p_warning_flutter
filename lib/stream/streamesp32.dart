@@ -14,25 +14,38 @@ class StreamView extends StatefulWidget {
 
 class _StreamViewState extends State<StreamView> {
   WebSocketChannel? channel;
+  int i = 0;
   final refdata = FirebaseDatabase.instance.ref();
   late String IP;
+
   @override
   void initState() {
     super.initState();
     refdata.child('IP/').onValue.listen((event) {
-      IP = event.snapshot.value.toString();
+      setState(() {
+        IP = event.snapshot.value.toString();
+        channel = IOWebSocketChannel.connect('ws://${IP}:81');
+        print(IP);
+      });
+    });
+    print(i++);
+  }
+
+  void reconnect() {
+    setState(() {
       channel = IOWebSocketChannel.connect('ws://${IP}:81');
-      print(IP);
     });
   }
 
   @override
-  Widget build(BuildContext context) {
-    // if (channel == null) {
-    //   // return a placeholder or loading indicator until channel is initialized
-    //   return CircularProgressIndicator();
-    // }
+  void dispose() {
+    // Đóng kết nối của channel nếu channel không null
+    channel?.sink.close();
+    super.dispose();
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 211, 206, 189),
       body: SafeArea(
@@ -43,10 +56,6 @@ class _StreamViewState extends State<StreamView> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // const SizedBox(
-                  //   // height: 100,
-                  //   width: 1,
-                  // ),
                   GestureDetector(
                     onTap: () {
                       Navigator.pop(context);
@@ -97,6 +106,7 @@ class _StreamViewState extends State<StreamView> {
                           child: channel != null
                               ? StreamBuilder(
                                   stream: channel?.stream,
+                                  // initialData: ,
                                   builder: (context, snapshot) {
                                     if (snapshot.hasError) {
                                       return Center(
@@ -137,6 +147,7 @@ class _StreamViewState extends State<StreamView> {
                           ),
                           ElevatedButton(
                             onPressed: () {
+                              reconnect();
                               // Handle reconnect
                             },
                             child: const Text('Reconnect'),
