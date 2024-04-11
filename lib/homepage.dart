@@ -191,7 +191,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => StreamView(),
+                        builder: (context) => const StreamView(),
                       )),
                 ),
                 const Divider(), // Thêm Divider giữa các ListTile

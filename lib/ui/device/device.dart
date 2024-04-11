@@ -37,7 +37,7 @@ class _DeviceState extends State<Device> {
                       color: Colors.indigo,
                     ),
                   ),
-                  RotatedBox(
+                  const RotatedBox(
                     quarterTurns: 135,
                     child: Icon(
                       Icons.bar_chart_rounded,

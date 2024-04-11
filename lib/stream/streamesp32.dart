@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api
+// ignore_for_file: library_private_types_in_public_api, avoid_print
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +16,7 @@ class _StreamViewState extends State<StreamView> {
   WebSocketChannel? channel;
   int i = 0;
   final refdata = FirebaseDatabase.instance.ref();
+  // ignore: non_constant_identifier_names
   late String IP;
 
   @override
@@ -24,7 +25,7 @@ class _StreamViewState extends State<StreamView> {
     refdata.child('IP/').onValue.listen((event) {
       setState(() {
         IP = event.snapshot.value.toString();
-        channel = IOWebSocketChannel.connect('ws://${IP}:81');
+        channel = IOWebSocketChannel.connect('ws://$IP:81');
         print(IP);
       });
     });
@@ -33,7 +34,7 @@ class _StreamViewState extends State<StreamView> {
 
   void reconnect() {
     setState(() {
-      channel = IOWebSocketChannel.connect('ws://${IP}:81');
+      channel = IOWebSocketChannel.connect('ws://$IP:81');
     });
   }
 
@@ -85,9 +86,9 @@ class _StreamViewState extends State<StreamView> {
                 child: Container(
                   width: 400,
                   height: 400,
-                  margin: const EdgeInsets.all(20),
+                  margin: const EdgeInsets.all(5),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: const Color.fromARGB(255, 217, 219, 222),
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
@@ -109,14 +110,16 @@ class _StreamViewState extends State<StreamView> {
                                   // initialData: ,
                                   builder: (context, snapshot) {
                                     if (snapshot.hasError) {
-                                      return Center(
+                                      return const Center(
                                         child: SizedBox(
-                                          height: 200,
-                                          width: 250,
+                                          // height: 200,
+                                          // width: 250,
                                           child: Text(
-                                            'Error: ${snapshot.error}',
-                                            style:
-                                                const TextStyle(fontSize: 15),
+                                            'Restart ESP32',
+                                            style: TextStyle(
+                                              fontSize: 30,
+                                              color: Colors.redAccent,
+                                            ),
                                           ),
                                         ),
                                       );
@@ -129,22 +132,16 @@ class _StreamViewState extends State<StreamView> {
                                       return Image.memory(
                                         snapshot.data,
                                         gaplessPlayback: true,
-                                        width: 260,
-                                        height: 280,
+                                        width: 290,
+                                        height: 300,
                                       );
                                     }
                                   },
                                 )
-                              : Text("Loading...")),
+                              : const Text("Loading...")),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              // Handle capture image
-                            },
-                            child: const Text('Capture Image'),
-                          ),
                           ElevatedButton(
                             onPressed: () {
                               reconnect();
@@ -154,7 +151,7 @@ class _StreamViewState extends State<StreamView> {
                           ),
                         ],
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 20,
                       )
                     ],
