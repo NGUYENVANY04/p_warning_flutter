@@ -17,8 +17,6 @@ class StreamView extends StatefulWidget {
 }
 
 class _StreamViewState extends State<StreamView> {
-  int _counter = 0;
-  late Uint8List _imageFile;
   final controller = ScreenshotController();
   WebSocketChannel? channel;
   int i = 0;
@@ -48,9 +46,10 @@ class _StreamViewState extends State<StreamView> {
   Future<void> _saveImage(Uint8List imageBytes) async {
     try {
       final result = await ImageGallerySaver.saveImage(imageBytes);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Image saved to: $result')),
-      );
+      // ignore: use_build_context_synchronously
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(content: Text('Image saved to: $result')),
+      // );
     } catch (e) {
       print('Error saving image: $e');
     }
