@@ -1,9 +1,13 @@
 // ignore_for_file: library_private_types_in_public_api, avoid_print
 
+import 'dart:typed_data';
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:screenshot/screenshot.dart';
 
 class StreamView extends StatefulWidget {
   const StreamView({Key? key}) : super(key: key);
@@ -13,6 +17,9 @@ class StreamView extends StatefulWidget {
 }
 
 class _StreamViewState extends State<StreamView> {
+  int _counter = 0;
+  late Uint8List _imageFile;
+  final controller = ScreenshotController();
   WebSocketChannel? channel;
   int i = 0;
   final refdata = FirebaseDatabase.instance.ref();
@@ -36,6 +43,17 @@ class _StreamViewState extends State<StreamView> {
     setState(() {
       channel = IOWebSocketChannel.connect('ws://$IP:81');
     });
+  }
+
+  Future<void> _saveImage(Uint8List imageBytes) async {
+    try {
+      final result = await ImageGallerySaver.saveImage(imageBytes);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Image saved to: $result')),
+      );
+    } catch (e) {
+      print('Error saving image: $e');
+    }
   }
 
   @override
@@ -129,11 +147,14 @@ class _StreamViewState extends State<StreamView> {
                                         child: CircularProgressIndicator(),
                                       );
                                     } else {
-                                      return Image.memory(
-                                        snapshot.data,
-                                        gaplessPlayback: true,
-                                        width: 290,
-                                        height: 300,
+                                      return Screenshot(
+                                        controller: controller,
+                                        child: Image.memory(
+                                          snapshot.data,
+                                          gaplessPlayback: true,
+                                          width: 290,
+                                          height: 300,
+                                        ),
                                       );
                                     }
                                   },
@@ -148,6 +169,22 @@ class _StreamViewState extends State<StreamView> {
                               // Handle reconnect
                             },
                             child: const Text('Reconnect'),
+                          ),
+                          ElevatedButton(
+                            child: const Text(
+                              'Capture',
+                            ),
+                            onPressed: () {
+                              controller.capture().then((image) async {
+                                if (image != null) {
+                                  await _saveImage(image);
+                                } else {
+                                  print('Failed to capture image');
+                                }
+                              }).catchError((onError) {
+                                print('Error capturing image: $onError');
+                              });
+                            },
                           ),
                         ],
                       ),

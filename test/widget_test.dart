@@ -1,30 +1,107 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:screenshot/screenshot.dart';
+import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:firebase_database/firebase_database.dart';
 
-import 'package:p_warning_flutter/main.dart';
+class StreamView extends StatefulWidget {
+  const StreamView({Key? key}) : super(key: key);
 
-void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  @override
+  _StreamViewState createState() => _StreamViewState();
+}
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+class _StreamViewState extends State<StreamView> {
+  late Uint8List _imageFile;
+  final controller = ScreenshotController();
+  late WebSocketChannel? channel;
+  late String IP;
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+  @override
+  void initState() {
+    super.initState();
+    _initializeWebSocket();
+  }
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
-  });
+  void _initializeWebSocket() {
+    final refdata = FirebaseDatabase.instance.ref();
+    refdata.child('IP/').onValue.listen((event) {
+      setState(() {
+        IP = event.snapshot.value.toString();
+        channel = IOWebSocketChannel.connect('ws://$IP:81');
+        print(IP);
+      });
+    });
+  }
+
+  void reconnect() {
+    setState(() {
+      if (IP.isNotEmpty) {
+        channel = IOWebSocketChannel.connect('ws://$IP:81');
+      } else {
+        print('IP is not available');
+      }
+    });
+  }
+
+  Future<void> _saveImage(Uint8List imageBytes) async {
+    try {
+      final result = await ImageGallerySaver.saveImage(imageBytes);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Image saved to: $result')),
+      );
+    } catch (e) {
+      print('Error saving image: $e');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Stream View'),
+      ),
+      body: Screenshot(
+        controller: controller,
+        child: StreamBuilder(
+          stream: channel?.stream,
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Center(
+                child: Text(
+                  'Error: ${snapshot.error}',
+                  style: TextStyle(color: Colors.red),
+                ),
+              );
+            } else if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            } else {
+              return Image.memory(
+                snapshot.data,
+                gaplessPlayback: true,
+              );
+            }
+          },
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          controller.capture().then((image) async {
+            if (image != null) {
+              await _saveImage(image);
+            } else {
+              print('Failed to capture image');
+            }
+          }).catchError((onError) {
+            print('Error capturing image: $onError');
+          });
+        },
+        child: Icon(Icons.camera),
+      ),
+    );
+  }
 }
