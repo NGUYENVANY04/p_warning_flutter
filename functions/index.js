@@ -4,10 +4,10 @@ const admin = require("firebase-admin");
 admin.initializeApp();
 
 exports.helloWolrd = functions.database.ref("/isNoti")
-    .on(async (change, context) => {
+    .onWrite(async (change, context) => {
       try {
         const dataState = change.after.val(); // Giá trị sau khi thay đổi
-        if (dataState == true) {
+        if (dataState == false) {
           console.log("New data:", dataState);
 
           // Lấy token từ cơ sở dữ liệu Firebase Realtime Database

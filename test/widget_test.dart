@@ -61,7 +61,7 @@ class _StreamViewState extends State<StreamView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Stream View'),
+        title: const Text('Stream View'),
       ),
       body: Screenshot(
         controller: controller,
@@ -72,11 +72,11 @@ class _StreamViewState extends State<StreamView> {
               return Center(
                 child: Text(
                   'Error: ${snapshot.error}',
-                  style: TextStyle(color: Colors.red),
+                  style: const TextStyle(color: Colors.red),
                 ),
               );
             } else if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(
+              return const Center(
                 child: CircularProgressIndicator(),
               );
             } else {
@@ -100,7 +100,7 @@ class _StreamViewState extends State<StreamView> {
             print('Error capturing image: $onError');
           });
         },
-        child: Icon(Icons.camera),
+        child: const Icon(Icons.camera),
       ),
     );
   }

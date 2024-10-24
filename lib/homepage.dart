@@ -217,7 +217,28 @@ class _HomeScreenState extends State<HomeScreen> {
                       )),
                 ),
                 const Divider(), // Thêm Divider giữa các ListTile
+                ListTile(
+                  leading: const Icon(
+                    Icons.devices_other_rounded,
+                    weight: 20,
+                  ),
+                  iconColor: const Color.fromARGB(255, 90, 75, 74),
+                  // subtitle: const Text('Dashboard'),
+                  title: const Text(
+                    'Stream MQTT',
+                    style: TextStyle(
+                        color: Color.fromARGB(255, 27, 8, 7),
+                        fontStyle: FontStyle.normal,
+                        fontSize: 15),
+                  ),
 
+                  onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const Device(),
+                      )),
+                ),
+                const Divider(), // Th
                 const Spacer(),
               ],
             ),
